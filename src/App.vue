@@ -20,11 +20,13 @@
     <h1>{{ person.name }}</h1>
     <h1 v-if="loading">loading...</h1>
     <img v-if="loaded" :src="result[0].url" />
+    <h1 v-if="loading">loading...</h1>
+    <img v-if="loaded" :src="result.message" />
   </div>
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs, watch, ref } from "vue";
+import { computed, reactive, toRefs, watch, ref, unref } from "vue";
 import useURLLoader from "./userLoader";
 import Modal from "./components/modal.vue";
 import AsyncShow from "./components/AsyncShow.vue";
@@ -53,7 +55,6 @@ export default {
   },
   setup() {
     const data: DataProps = reactive({
-      // 邮箱校验
       count: 0,
       increase: () => {
         data.count++;
@@ -62,14 +63,22 @@ export default {
       numbers: [0, 1, 2],
       person: {},
     });
-    const { result, loading, loaded } = useURLLoader<CatResult[]>(
+    console.log(data)
+    // const result1:object = ref({});
+    const dog = useURLLoader<DogReult>(
+      "https://dog.ceo/api/breeds/image/random"
+    );
+    const cat = useURLLoader<CatResult[]>(
       "https://api.thecatapi.com/v1/images/search?limit=1"
     );
-    watch(result, () => {
-      if (result.value) {
-        console.log("result", result.value[0].url);
-      }
-    });
+     const {result,loaded,loading} = dog
+    // watch(result, () => {
+    //   // if (cat.value) {
+    //   //   console.log("result", result.value[0].url);
+    //   // }
+    //   console.log("result1",cat,dog)
+    // });
+
     const isOpen = ref(false);
     const openModal = () => {
       isOpen.value = true;
@@ -81,6 +90,7 @@ export default {
     const toRef = toRefs(data);
     return {
       ...toRef,
+      // result1,
       result,
       loading,
       loaded,
